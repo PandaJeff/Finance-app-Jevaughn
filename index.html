@@ -261,6 +261,7 @@
             color: #666;
             cursor: pointer;
             padding: 0;
+            font-size: 24px;
         }
 
         .form-group {
@@ -356,6 +357,17 @@
             font-size: 24px;
             font-weight: 700;
         }
+
+        .add-plan-btn {
+            background: #1a1a1a;
+            border: none;
+            color: #4ade80;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
@@ -400,11 +412,14 @@
         </div>
     </div>
 
-    <div class="section-title">Budget Plans</div>
-    <div id="budgetsList">
+    <div class="section-title" style="display: flex; justify-content: space-between; align-items: center;">
+        <span>Savings Plans</span>
+        <button class="add-plan-btn" onclick="openSavingsModal()">+ Add Plan</button>
+    </div>
+    <div id="savingsList">
         <div class="empty-state">
-            <div class="empty-title">No budget plans</div>
-            <div class="empty-subtitle">Create your first budget plan</div>
+            <div class="empty-title">No savings plans</div>
+            <div class="empty-subtitle">Create your first savings plan</div>
         </div>
     </div>
 
@@ -439,7 +454,7 @@
                 <button class="close-btn" onclick="closeModal('balanceModal')">✕</button>
             </div>
             <div style="background: #2a1a1a; border-left: 3px solid #ef4444; padding: 12px; border-radius: 8px; margin-bottom: 20px; color: #fca5a5; font-size: 14px;">
-                ⚠️ Warning: Changing your balance will reset all transactions and budget plans!
+                ⚠️ Warning: Changing your balance will reset all transactions and savings plans!
             </div>
             <div class="form-group">
                 <label class="form-label">Amount</label>
@@ -456,7 +471,7 @@
                 <div class="modal-title">Are You Sure?</div>
                 <button class="close-btn" onclick="closeModal('confirmModal')">✕</button>
             </div>
-            <p style="color: #999; margin-bottom: 20px;">This will permanently delete all your transactions and budget plans. This action cannot be undone.</p>
+            <p style="color: #999; margin-bottom: 20px;">This will permanently delete all your transactions and savings plans. This action cannot be undone.</p>
             <div style="display: flex; gap: 10px;">
                 <button class="submit-btn" style="background: #333; color: #fff;" onclick="closeModal('confirmModal')">Cancel</button>
                 <button class="submit-btn" style="background: #ef4444;" onclick="setBalance()">Yes, Reset Everything</button>
@@ -513,26 +528,41 @@
         </div>
     </div>
 
-    <!-- Budget Modal -->
-    <div class="modal" id="budgetModal">
+    <!-- Savings Modal -->
+    <div class="modal" id="savingsModal">
         <div class="modal-content">
             <div class="modal-header">
-                <div class="modal-title">Create Budget Plan</div>
-                <button class="close-btn" onclick="closeModal('budgetModal')">✕</button>
+                <div class="modal-title">Create Savings Plan</div>
+                <button class="close-btn" onclick="closeModal('savingsModal')">✕</button>
             </div>
             <div class="form-group">
                 <label class="form-label">Plan Name</label>
-                <input type="text" class="form-input" id="budgetName" placeholder="e.g., Vacation, New Car">
+                <input type="text" class="form-input" id="savingsName" placeholder="e.g., Vacation, New Car">
             </div>
             <div class="form-group">
                 <label class="form-label">Target Amount</label>
-                <input type="number" class="form-input" id="budgetTarget" placeholder="0.00" step="0.01">
+                <input type="number" class="form-input" id="savingsTarget" placeholder="0.00" step="0.01">
             </div>
             <div class="form-group">
                 <label class="form-label">Current Amount</label>
-                <input type="number" class="form-input" id="budgetCurrent" placeholder="0.00" step="0.01" value="0">
+                <input type="number" class="form-input" id="savingsCurrent" placeholder="0.00" step="0.01" value="0">
             </div>
-            <button class="submit-btn" onclick="addBudget()">Create Budget</button>
+            <button class="submit-btn" onclick="addSavings()">Create Savings Plan</button>
+        </div>
+    </div>
+
+    <!-- Add to Savings Modal -->
+    <div class="modal" id="addToSavingsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Add to <span id="selectedSavingsName"></span></div>
+                <button class="close-btn" onclick="closeModal('addToSavingsModal')">✕</button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Amount to Add</label>
+                <input type="number" class="form-input" id="addToSavingsAmount" placeholder="0.00" step="0.01">
+            </div>
+            <button class="submit-btn" onclick="addMoneyToSavings()">Add Money</button>
         </div>
     </div>
 
@@ -546,8 +576,9 @@
 
         let balance = 0;
         let transactions = [];
-        let budgets = [];
+        let savings = [];
         let selectedCategory = '';
+        let selectedSavingsIndex = -1;
 
         // Load data on start
         loadData();
@@ -558,8 +589,24 @@
                 const data = JSON.parse(saved);
                 balance = data.balance || 0;
                 transactions = data.transactions || [];
-                budgets = data.budgets || [];
+                savings = data.savings || [];
             }
+            
+            // Add default savings plans if none exist and balance is set
+            if (savings.length === 0 && balance > 0) {
+                savings.push({
+                    name: 'Savings Goal',
+                    target: 10000,
+                    current: 0
+                });
+                savings.push({
+                    name: 'Emergency Fund',
+                    target: 5000,
+                    current: 0
+                });
+                saveData();
+            }
+            
             updateDisplay();
         }
 
@@ -567,18 +614,18 @@
             localStorage.setItem('financeData', JSON.stringify({
                 balance,
                 transactions,
-                budgets
+                savings
             }));
         }
 
         function updateDisplay() {
             document.getElementById('balanceDisplay').textContent = `J$${balance.toFixed(2)}`;
             
-            const totalSpent = transactions.reduce((sum, t) => sum + t.amount, 0);
+            const totalSpent = transactions.reduce((sum, t) => t.isIncome ? sum : sum + t.amount, 0);
             document.getElementById('totalSpending').textContent = `J$${totalSpent.toFixed(2)}`;
             
             updateTransactionsList();
-            updateBudgetsList();
+            updateSavingsList();
             updateStats();
         }
 
@@ -598,30 +645,30 @@
                             <div class="transaction-category">${t.category}</div>
                             <div class="transaction-date">${t.date}${t.note ? ' • ' + t.note : ''}</div>
                         </div>
-                        <div class="transaction-amount">-J$${t.amount.toFixed(2)}</div>
+                        <div class="transaction-amount" style="color: ${t.isIncome ? '#4ade80' : '#ef4444'}">${t.isIncome ? '+' : '-'}J$${t.amount.toFixed(2)}</div>
                     </div>
                 `).join('');
             }
         }
 
-        function updateBudgetsList() {
-            const list = document.getElementById('budgetsList');
-            if (budgets.length === 0) {
+        function updateSavingsList() {
+            const list = document.getElementById('savingsList');
+            if (savings.length === 0) {
                 list.innerHTML = `
                     <div class="empty-state">
-                        <div class="empty-title">No budget plans</div>
-                        <div class="empty-subtitle">Create your first budget plan</div>
+                        <div class="empty-title">No savings plans</div>
+                        <div class="empty-subtitle">Create your first savings plan</div>
                     </div>
                 `;
             } else {
                 const colors = ['#4ade80', '#fbbf24', '#f87171', '#60a5fa', '#a78bfa', '#fb923c'];
-                list.innerHTML = budgets.map((b, i) => {
-                    const progress = (b.current / b.target) * 100;
+                list.innerHTML = savings.map((s, i) => {
+                    const progress = (s.current / s.target) * 100;
                     return `
-                        <div class="budget-item">
+                        <div class="budget-item" onclick="openAddToSavingsModal(${i})" style="cursor: pointer;">
                             <div class="budget-header">
-                                <div class="budget-name">${b.name}</div>
-                                <div class="budget-amount">J$${b.current.toFixed(2)} / J$${b.target.toFixed(2)}</div>
+                                <div class="budget-name">${s.name}</div>
+                                <div class="budget-amount">J$${s.current.toFixed(2)} / J$${s.target.toFixed(2)}</div>
                             </div>
                             <div class="progress-bar">
                                 <div class="progress-fill" style="width: ${Math.min(progress, 100)}%; background: ${colors[i % colors.length]}"></div>
@@ -633,7 +680,7 @@
         }
 
         function updateStats() {
-            const totalPlanned = budgets.reduce((sum, b) => sum + b.target, 0);
+            const totalPlanned = savings.reduce((sum, s) => sum + s.target, 0);
             document.getElementById('totalPlanned').textContent = `J$${totalPlanned.toFixed(2)}`;
             document.getElementById('remaining').textContent = `J$${balance.toFixed(2)}`;
         }
@@ -657,6 +704,20 @@
             document.getElementById('expenseModal').classList.add('active');
         }
 
+        function openSavingsModal() {
+            document.getElementById('savingsName').value = '';
+            document.getElementById('savingsTarget').value = '';
+            document.getElementById('savingsCurrent').value = '0';
+            document.getElementById('savingsModal').classList.add('active');
+        }
+
+        function openAddToSavingsModal(index) {
+            selectedSavingsIndex = index;
+            document.getElementById('selectedSavingsName').textContent = savings[index].name;
+            document.getElementById('addToSavingsAmount').value = '';
+            document.getElementById('addToSavingsModal').classList.add('active');
+        }
+
         function closeModal(id) {
             document.getElementById(id).classList.remove('active');
         }
@@ -671,7 +732,7 @@
             if (!isNaN(value) && value >= 0) {
                 balance = value;
                 transactions = [];
-                budgets = [];
+                savings = [];
                 saveData();
                 updateDisplay();
                 closeModal('confirmModal');
@@ -682,6 +743,13 @@
             const value = parseFloat(document.getElementById('addMoneyInput').value);
             if (!isNaN(value) && value > 0) {
                 balance += value;
+                transactions.push({
+                    amount: value,
+                    category: 'Income',
+                    note: 'Money Added',
+                    date: new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
+                    isIncome: true
+                });
                 saveData();
                 updateDisplay();
                 closeModal('addMoneyModal');
@@ -708,7 +776,8 @@
                     amount,
                     category: category,
                     note,
-                    date: new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+                    date: new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
+                    isIncome: false
                 });
                 saveData();
                 updateDisplay();
@@ -716,48 +785,43 @@
             }
         }
 
-        function addBudget() {
-            const name = document.getElementById('budgetName').value;
-            const target = parseFloat(document.getElementById('budgetTarget').value);
-            const current = parseFloat(document.getElementById('budgetCurrent').value);
+        function addSavings() {
+            const name = document.getElementById('savingsName').value;
+            const target = parseFloat(document.getElementById('savingsTarget').value);
+            const current = parseFloat(document.getElementById('savingsCurrent').value);
             
             if (name && !isNaN(target) && target > 0 && !isNaN(current) && current >= 0) {
-                budgets.push({ name, target, current });
+                savings.push({ name, target, current });
                 saveData();
                 updateDisplay();
-                closeModal('budgetModal');
+                closeModal('savingsModal');
             }
         }
 
-        // Long press to open budget modal
-        let pressTimer;
-        document.querySelector('.add-btn').addEventListener('mousedown', function() {
-            pressTimer = setTimeout(() => {
-                closeModal('expenseModal');
-                document.getElementById('budgetName').value = '';
-                document.getElementById('budgetTarget').value = '';
-                document.getElementById('budgetCurrent').value = '0';
-                document.getElementById('budgetModal').classList.add('active');
-            }, 500);
-        });
-
-        document.querySelector('.add-btn').addEventListener('mouseup', function() {
-            clearTimeout(pressTimer);
-        });
-
-        document.querySelector('.add-btn').addEventListener('touchstart', function() {
-            pressTimer = setTimeout(() => {
-                closeModal('expenseModal');
-                document.getElementById('budgetName').value = '';
-                document.getElementById('budgetTarget').value = '';
-                document.getElementById('budgetCurrent').value = '0';
-                document.getElementById('budgetModal').classList.add('active');
-            }, 500);
-        });
-
-        document.querySelector('.add-btn').addEventListener('touchend', function() {
-            clearTimeout(pressTimer);
-        });
+        function addMoneyToSavings() {
+            const amount = parseFloat(document.getElementById('addToSavingsAmount').value);
+            
+            if (!isNaN(amount) && amount > 0 && selectedSavingsIndex >= 0) {
+                if (amount <= balance) {
+                    savings[selectedSavingsIndex].current += amount;
+                    balance -= amount;
+                    
+                    transactions.push({
+                        amount: amount,
+                        category: 'Savings',
+                        note: `Added to ${savings[selectedSavingsIndex].name}`,
+                        date: new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
+                        isIncome: false
+                    });
+                    
+                    saveData();
+                    updateDisplay();
+                    closeModal('addToSavingsModal');
+                } else {
+                    alert('Insufficient balance!');
+                }
+            }
+        }
     </script>
 </body>
 </html>
