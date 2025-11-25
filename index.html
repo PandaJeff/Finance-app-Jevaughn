@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#000000">
+    <meta name="description" content="Simple finance tracker for students">
+    <title>Finance Tracker</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            padding: 20px;
+            max-width: 428px;
+            margin: 0 auto;
+            min-height: 100vh;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .wallet-icon {
+            width: 32px;
+            height: 32px;
+        }
+
+        .edit-btn {
+            background: #1a1a1a;
+            border: none;
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .balance-section {
+            margin-bottom: 30px;
+        }
+
+        .balance-label {
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .balance-amount {
+            font-size: 56px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .action-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .action-card {
+            background: #1a1a1a;
+            border-radius: 16px;
+            padding: 20px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .action-card:hover {
+            background: #252525;
+        }
+
+        .action-icon {
+            width: 32px;
+            height: 32px;
+            margin-bottom: 12px;
+        }
+
+        .add-money { color: #4ade80; }
+        .spending { color: #fbbf24; }
+
+        .action-label {
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .action-amount {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .transactions-list {
+            margin-bottom: 30px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+
+        .empty-title {
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .empty-subtitle {
+            font-size: 14px;
+            color: #444;
+        }
+
+        .transaction-item {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .transaction-info {
+            flex: 1;
+        }
+
+        .transaction-category {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .transaction-date {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .transaction-amount {
+            font-size: 18px;
+            font-weight: 700;
+            color: #ef4444;
+        }
+
+        .budget-item {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 10px;
+        }
+
+        .budget-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .budget-name {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .budget-amount {
+            font-size: 14px;
+            color: #888;
+        }
+
+        .progress-bar {
+            background: #2a2a2a;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+
+        .add-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: #fff;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(255,255,255,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .add-btn svg {
+            stroke: #000;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.9);
+            z-index: 1000;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: #1a1a1a;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            background: #000;
+            border: 1px solid #333;
+            color: #fff;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #4ade80;
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .category-btn {
+            background: #000;
+            border: 1px solid #333;
+            color: #fff;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .category-btn.active {
+            border-color: #4ade80;
+            background: rgba(74, 222, 128, 0.1);
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: #fff;
+            border: none;
+            color: #000;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .submit-btn:hover {
+            background: #f0f0f0;
+        }
+
+        .stats-section {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid #222;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .stat-card {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .stat-label {
+            color: #888;
+            font-size: 12px;
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <svg class="wallet-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/>
+            <path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/>
+            <path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/>
+        </svg>
+        <button class="edit-btn" onclick="openBalanceModal()">Edit</button>
+    </div>
+
+    <div class="balance-section">
+        <div class="balance-label">Current Balance</div>
+        <div class="balance-amount" id="balanceDisplay">J$0.00</div>
+    </div>
+
+    <div class="action-cards">
+        <div class="action-card" onclick="openAddMoneyModal()">
+            <svg class="action-icon add-money" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 8v8m-4-4h8"/>
+            </svg>
+            <div class="action-label">Add Money</div>
+            <div class="action-amount">+</div>
+        </div>
+        <div class="action-card">
+            <svg class="action-icon spending" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 6v6l4 2"/>
+            </svg>
+            <div class="action-label">Spending</div>
+            <div class="action-amount" id="totalSpending">J$0.00</div>
+        </div>
+    </div>
+
+    <div class="section-title">Recent Transactions</div>
+    <div class="transactions-list" id="transactionsList">
+        <div class="empty-state">
+            <div class="empty-title">No transactions yet</div>
+            <div class="empty-subtitle">Add your first expense below</div>
+        </div>
+    </div>
+
+    <div class="section-title">Budget Plans</div>
+    <div id="budgetsList">
+        <div class="empty-state">
+            <div class="empty-title">No budget plans</div>
+            <div class="empty-subtitle">Create your first budget plan</div>
+        </div>
+    </div>
+
+    <div class="stats-section">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Planned</div>
+                <div class="stat-value" id="totalPlanned">J$0.00</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Remaining</div>
+                <div class="stat-value" id="remaining">J$0.00</div>
+            </div>
+        </div>
+    </div>
+
+    <div style="text-align: center; padding: 40px 20px 80px; color: #444; font-size: 12px;">
+        Made by theoneandonlyJev
+    </div>
+
+    <button class="add-btn" onclick="openExpenseModal()">
+        <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="3">
+            <path d="M12 5v14m-7-7h14"/>
+        </svg>
+    </button>
+
+    <!-- Balance Modal -->
+    <div class="modal" id="balanceModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Set Balance</div>
+                <button class="close-btn" onclick="closeModal('balanceModal')">✕</button>
+            </div>
+            <div style="background: #2a1a1a; border-left: 3px solid #ef4444; padding: 12px; border-radius: 8px; margin-bottom: 20px; color: #fca5a5; font-size: 14px;">
+                ⚠️ Warning: Changing your balance will reset all transactions and budget plans!
+            </div>
+            <div class="form-group">
+                <label class="form-label">Amount</label>
+                <input type="number" class="form-input" id="balanceInput" placeholder="0.00" step="0.01">
+            </div>
+            <button class="submit-btn" onclick="confirmBalanceChange()">Save Balance</button>
+        </div>
+    </div>
+
+    <!-- Confirm Reset Modal -->
+    <div class="modal" id="confirmModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Are You Sure?</div>
+                <button class="close-btn" onclick="closeModal('confirmModal')">✕</button>
+            </div>
+            <p style="color: #999; margin-bottom: 20px;">This will permanently delete all your transactions and budget plans. This action cannot be undone.</p>
+            <div style="display: flex; gap: 10px;">
+                <button class="submit-btn" style="background: #333; color: #fff;" onclick="closeModal('confirmModal')">Cancel</button>
+                <button class="submit-btn" style="background: #ef4444;" onclick="setBalance()">Yes, Reset Everything</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Money Modal -->
+    <div class="modal" id="addMoneyModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Add Money</div>
+                <button class="close-btn" onclick="closeModal('addMoneyModal')">✕</button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Amount</label>
+                <input type="number" class="form-input" id="addMoneyInput" placeholder="0.00" step="0.01">
+            </div>
+            <button class="submit-btn" onclick="addMoney()">Add Money</button>
+        </div>
+    </div>
+
+    <!-- Expense Modal -->
+    <div class="modal" id="expenseModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Add Expense</div>
+                <button class="close-btn" onclick="closeModal('expenseModal')">✕</button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Amount</label>
+                <input type="number" class="form-input" id="expenseAmount" placeholder="0.00" step="0.01">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Category</label>
+                <div class="category-grid">
+                    <button class="category-btn" onclick="selectCategory(this, 'Food')">🍔 Food</button>
+                    <button class="category-btn" onclick="selectCategory(this, 'Transport')">🚗 Transport</button>
+                    <button class="category-btn" onclick="selectCategory(this, 'Shopping')">🛍️ Shopping</button>
+                    <button class="category-btn" onclick="selectCategory(this, 'Bills')">📱 Bills</button>
+                    <button class="category-btn" onclick="selectCategory(this, 'Entertainment')">🎮 Fun</button>
+                    <button class="category-btn" onclick="selectCategory(this, 'Other')">📌 Other</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Or Create Custom Category</label>
+                <input type="text" class="form-input" id="customCategory" placeholder="e.g., Healthcare, Education...">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Note (Optional)</label>
+                <input type="text" class="form-input" id="expenseNote" placeholder="Add a note...">
+            </div>
+            <button class="submit-btn" onclick="addExpense()">Add Expense</button>
+        </div>
+    </div>
+
+    <!-- Budget Modal -->
+    <div class="modal" id="budgetModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Create Budget Plan</div>
+                <button class="close-btn" onclick="closeModal('budgetModal')">✕</button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Plan Name</label>
+                <input type="text" class="form-input" id="budgetName" placeholder="e.g., Vacation, New Car">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Target Amount</label>
+                <input type="number" class="form-input" id="budgetTarget" placeholder="0.00" step="0.01">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Current Amount</label>
+                <input type="number" class="form-input" id="budgetCurrent" placeholder="0.00" step="0.01" value="0">
+            </div>
+            <button class="submit-btn" onclick="addBudget()">Create Budget</button>
+        </div>
+    </div>
+
+    <script>
+        // Register service worker for PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+                .then(reg => console.log('Service Worker registered'))
+                .catch(err => console.log('Service Worker registration failed'));
+        }
+
+        let balance = 0;
+        let transactions = [];
+        let budgets = [];
+        let selectedCategory = '';
+
+        // Load data on start
+        loadData();
+
+        function loadData() {
+            const saved = localStorage.getItem('financeData');
+            if (saved) {
+                const data = JSON.parse(saved);
+                balance = data.balance || 0;
+                transactions = data.transactions || [];
+                budgets = data.budgets || [];
+            }
+            updateDisplay();
+        }
+
+        function saveData() {
+            localStorage.setItem('financeData', JSON.stringify({
+                balance,
+                transactions,
+                budgets
+            }));
+        }
+
+        function updateDisplay() {
+            document.getElementById('balanceDisplay').textContent = `J$${balance.toFixed(2)}`;
+            
+            const totalSpent = transactions.reduce((sum, t) => sum + t.amount, 0);
+            document.getElementById('totalSpending').textContent = `J$${totalSpent.toFixed(2)}`;
+            
+            updateTransactionsList();
+            updateBudgetsList();
+            updateStats();
+        }
+
+        function updateTransactionsList() {
+            const list = document.getElementById('transactionsList');
+            if (transactions.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-title">No transactions yet</div>
+                        <div class="empty-subtitle">Add your first expense below</div>
+                    </div>
+                `;
+            } else {
+                list.innerHTML = transactions.slice(-5).reverse().map(t => `
+                    <div class="transaction-item">
+                        <div class="transaction-info">
+                            <div class="transaction-category">${t.category}</div>
+                            <div class="transaction-date">${t.date}${t.note ? ' • ' + t.note : ''}</div>
+                        </div>
+                        <div class="transaction-amount">-J$${t.amount.toFixed(2)}</div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function updateBudgetsList() {
+            const list = document.getElementById('budgetsList');
+            if (budgets.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-title">No budget plans</div>
+                        <div class="empty-subtitle">Create your first budget plan</div>
+                    </div>
+                `;
+            } else {
+                const colors = ['#4ade80', '#fbbf24', '#f87171', '#60a5fa', '#a78bfa', '#fb923c'];
+                list.innerHTML = budgets.map((b, i) => {
+                    const progress = (b.current / b.target) * 100;
+                    return `
+                        <div class="budget-item">
+                            <div class="budget-header">
+                                <div class="budget-name">${b.name}</div>
+                                <div class="budget-amount">J$${b.current.toFixed(2)} / J$${b.target.toFixed(2)}</div>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${Math.min(progress, 100)}%; background: ${colors[i % colors.length]}"></div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        function updateStats() {
+            const totalPlanned = budgets.reduce((sum, b) => sum + b.target, 0);
+            document.getElementById('totalPlanned').textContent = `J$${totalPlanned.toFixed(2)}`;
+            document.getElementById('remaining').textContent = `J$${balance.toFixed(2)}`;
+        }
+
+        function openBalanceModal() {
+            document.getElementById('balanceInput').value = balance;
+            document.getElementById('balanceModal').classList.add('active');
+        }
+
+        function openAddMoneyModal() {
+            document.getElementById('addMoneyInput').value = '';
+            document.getElementById('addMoneyModal').classList.add('active');
+        }
+
+        function openExpenseModal() {
+            document.getElementById('expenseAmount').value = '';
+            document.getElementById('expenseNote').value = '';
+            document.getElementById('customCategory').value = '';
+            selectedCategory = '';
+            document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('expenseModal').classList.add('active');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        function confirmBalanceChange() {
+            closeModal('balanceModal');
+            document.getElementById('confirmModal').classList.add('active');
+        }
+
+        function setBalance() {
+            const value = parseFloat(document.getElementById('balanceInput').value);
+            if (!isNaN(value) && value >= 0) {
+                balance = value;
+                transactions = [];
+                budgets = [];
+                saveData();
+                updateDisplay();
+                closeModal('confirmModal');
+            }
+        }
+
+        function addMoney() {
+            const value = parseFloat(document.getElementById('addMoneyInput').value);
+            if (!isNaN(value) && value > 0) {
+                balance += value;
+                saveData();
+                updateDisplay();
+                closeModal('addMoneyModal');
+            }
+        }
+
+        function selectCategory(btn, category) {
+            document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            selectedCategory = category;
+            document.getElementById('customCategory').value = '';
+        }
+
+        function addExpense() {
+            const amount = parseFloat(document.getElementById('expenseAmount').value);
+            const note = document.getElementById('expenseNote').value;
+            const customCat = document.getElementById('customCategory').value.trim();
+            
+            const category = customCat || selectedCategory;
+            
+            if (!isNaN(amount) && amount > 0 && category) {
+                balance -= amount;
+                transactions.push({
+                    amount,
+                    category: category,
+                    note,
+                    date: new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+                });
+                saveData();
+                updateDisplay();
+                closeModal('expenseModal');
+            }
+        }
+
+        function addBudget() {
+            const name = document.getElementById('budgetName').value;
+            const target = parseFloat(document.getElementById('budgetTarget').value);
+            const current = parseFloat(document.getElementById('budgetCurrent').value);
+            
+            if (name && !isNaN(target) && target > 0 && !isNaN(current) && current >= 0) {
+                budgets.push({ name, target, current });
+                saveData();
+                updateDisplay();
+                closeModal('budgetModal');
+            }
+        }
+
+        // Long press to open budget modal
+        let pressTimer;
+        document.querySelector('.add-btn').addEventListener('mousedown', function() {
+            pressTimer = setTimeout(() => {
+                closeModal('expenseModal');
+                document.getElementById('budgetName').value = '';
+                document.getElementById('budgetTarget').value = '';
+                document.getElementById('budgetCurrent').value = '0';
+                document.getElementById('budgetModal').classList.add('active');
+            }, 500);
+        });
+
+        document.querySelector('.add-btn').addEventListener('mouseup', function() {
+            clearTimeout(pressTimer);
+        });
+
+        document.querySelector('.add-btn').addEventListener('touchstart', function() {
+            pressTimer = setTimeout(() => {
+                closeModal('expenseModal');
+                document.getElementById('budgetName').value = '';
+                document.getElementById('budgetTarget').value = '';
+                document.getElementById('budgetCurrent').value = '0';
+                document.getElementById('budgetModal').classList.add('active');
+            }, 500);
+        });
+
+        document.querySelector('.add-btn').addEventListener('touchend', function() {
+            clearTimeout(pressTimer);
+        });
+    </script>
+</body>
+</html>
