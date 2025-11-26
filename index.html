@@ -29,7 +29,9 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #111;
         }
 
         .wallet-icon {
@@ -38,104 +40,133 @@
         }
 
         .edit-btn {
-            background: #1a1a1a;
-            border: none;
+            background: #111;
+            border: 1px solid #222;
             color: #fff;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 14px;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-size: 13px;
             cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .edit-btn:hover {
+            background: #1a1a1a;
+            border-color: #333;
         }
 
         .balance-section {
-            margin-bottom: 30px;
+            margin-bottom: 40px;
+            text-align: center;
+            padding: 30px 0;
         }
 
         .balance-label {
-            color: #888;
-            font-size: 14px;
-            margin-bottom: 8px;
+            color: #666;
+            font-size: 13px;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            font-weight: 500;
         }
 
         .balance-amount {
-            font-size: 56px;
+            font-size: 48px;
             font-weight: 700;
             margin-bottom: 20px;
+            letter-spacing: -2px;
         }
 
         .action-cards {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 30px;
+            gap: 12px;
+            margin-bottom: 40px;
         }
 
         .action-card {
-            background: #1a1a1a;
+            background: #0a0a0a;
+            border: 1px solid #111;
             border-radius: 16px;
-            padding: 20px;
+            padding: 24px 20px;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: all 0.2s;
         }
 
         .action-card:hover {
-            background: #252525;
+            background: #111;
+            border-color: #222;
+            transform: translateY(-2px);
         }
 
         .action-icon {
-            width: 32px;
-            height: 32px;
-            margin-bottom: 12px;
+            width: 28px;
+            height: 28px;
+            margin-bottom: 16px;
         }
 
         .add-money { color: #4ade80; }
-        .spending { color: #fbbf24; }
+        .spending { color: #ef4444; }
 
         .action-label {
-            color: #888;
-            font-size: 14px;
-            margin-bottom: 4px;
+            color: #666;
+            font-size: 12px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 500;
         }
 
         .action-amount {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 700;
+            letter-spacing: -0.5px;
         }
 
         .section-title {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 20px;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            letter-spacing: -0.5px;
         }
 
         .transactions-list {
-            margin-bottom: 30px;
+            margin-bottom: 40px;
         }
 
         .empty-state {
             text-align: center;
-            padding: 40px 20px;
-            color: #666;
-        }
-
-        .empty-title {
-            font-size: 16px;
-            margin-bottom: 8px;
-        }
-
-        .empty-subtitle {
-            font-size: 14px;
+            padding: 60px 20px;
             color: #444;
         }
 
+        .empty-title {
+            font-size: 15px;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .empty-subtitle {
+            font-size: 13px;
+            color: #333;
+        }
+
         .transaction-item {
-            background: #1a1a1a;
+            background: #0a0a0a;
+            border: 1px solid #111;
             border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 10px;
+            padding: 16px 18px;
+            margin-bottom: 8px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            transition: all 0.2s;
+        }
+
+        .transaction-item:hover {
+            background: #111;
+            border-color: #222;
         }
 
         .transaction-info {
@@ -143,57 +174,68 @@
         }
 
         .transaction-category {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
             margin-bottom: 4px;
+            letter-spacing: -0.3px;
         }
 
         .transaction-date {
-            font-size: 12px;
-            color: #666;
+            font-size: 11px;
+            color: #555;
+            font-weight: 500;
         }
 
         .transaction-amount {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 700;
-            color: #ef4444;
+            letter-spacing: -0.3px;
         }
 
         .budget-item {
-            background: #1a1a1a;
+            background: #0a0a0a;
+            border: 1px solid #111;
             border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 10px;
+            padding: 18px;
+            margin-bottom: 8px;
             position: relative;
+            transition: all 0.2s;
+        }
+
+        .budget-item:hover {
+            background: #111;
+            border-color: #222;
         }
 
         .budget-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
+            margin-bottom: 14px;
         }
 
         .budget-name {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
+            letter-spacing: -0.3px;
         }
 
         .budget-amount {
-            font-size: 14px;
-            color: #888;
+            font-size: 12px;
+            color: #666;
+            font-weight: 500;
         }
 
         .progress-bar {
-            background: #2a2a2a;
-            height: 8px;
-            border-radius: 4px;
+            background: #111;
+            height: 6px;
+            border-radius: 3px;
             overflow: hidden;
         }
 
         .progress-fill {
             height: 100%;
-            border-radius: 4px;
+            border-radius: 3px;
             transition: width 0.3s;
         }
 
@@ -201,16 +243,22 @@
             position: fixed;
             bottom: 30px;
             right: 20px;
-            width: 60px;
-            height: 60px;
+            width: 56px;
+            height: 56px;
             background: #fff;
             border: none;
             border-radius: 50%;
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(255,255,255,0.3);
+            box-shadow: 0 8px 24px rgba(255,255,255,0.15);
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .add-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 32px rgba(255,255,255,0.2);
         }
 
         .add-btn svg {
@@ -224,10 +272,11 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.9);
+            background: rgba(0,0,0,0.95);
             z-index: 1000;
             padding: 20px;
             overflow-y: auto;
+            backdrop-filter: blur(10px);
         }
 
         .modal.active {
@@ -237,7 +286,8 @@
         }
 
         .modal-content {
-            background: #1a1a1a;
+            background: #0a0a0a;
+            border: 1px solid #111;
             border-radius: 20px;
             padding: 30px;
             max-width: 400px;
@@ -248,12 +298,13 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
 
         .modal-title {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 700;
+            letter-spacing: -0.5px;
         }
 
         .close-btn {
@@ -263,6 +314,11 @@
             cursor: pointer;
             padding: 0;
             font-size: 24px;
+            transition: color 0.2s;
+        }
+
+        .close-btn:hover {
+            color: #999;
         }
 
         .form-group {
@@ -271,46 +327,56 @@
 
         .form-label {
             display: block;
-            color: #888;
-            font-size: 14px;
+            color: #666;
+            font-size: 13px;
             margin-bottom: 8px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .form-input {
             width: 100%;
             background: #000;
-            border: 1px solid #333;
+            border: 1px solid #222;
             color: #fff;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 16px;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 15px;
+            transition: all 0.2s;
         }
 
         .form-input:focus {
             outline: none;
             border-color: #4ade80;
+            background: #0a0a0a;
         }
 
         .category-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
+            gap: 8px;
         }
 
         .category-btn {
             background: #000;
-            border: 1px solid #333;
+            border: 1px solid #222;
             color: #fff;
-            padding: 12px;
-            border-radius: 8px;
+            padding: 14px 12px;
+            border-radius: 12px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 13px;
             transition: all 0.2s;
         }
 
         .category-btn.active {
             border-color: #4ade80;
-            background: rgba(74, 222, 128, 0.1);
+            background: rgba(74, 222, 128, 0.08);
+        }
+
+        .category-btn:hover {
+            background: #0a0a0a;
+            border-color: #333;
         }
 
         .submit-btn {
@@ -320,54 +386,74 @@
             color: #000;
             padding: 16px;
             border-radius: 12px;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
             cursor: pointer;
             margin-top: 20px;
+            transition: all 0.2s;
         }
 
         .submit-btn:hover {
-            background: #f0f0f0;
+            background: #f5f5f5;
+            transform: translateY(-1px);
         }
 
         .stats-section {
-            margin-top: 30px;
-            padding-top: 30px;
-            border-top: 1px solid #222;
+            margin-top: 40px;
+            padding-top: 40px;
+            border-top: 1px solid #111;
         }
 
         .stats-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            gap: 12px;
+            margin-bottom: 24px;
         }
 
         .stat-card {
-            background: #1a1a1a;
+            background: #0a0a0a;
+            border: 1px solid #111;
             border-radius: 12px;
-            padding: 16px;
+            padding: 20px 18px;
+            transition: all 0.2s;
+        }
+
+        .stat-card:hover {
+            background: #111;
+            border-color: #222;
         }
 
         .stat-label {
-            color: #888;
-            font-size: 12px;
-            margin-bottom: 4px;
+            color: #666;
+            font-size: 11px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 500;
         }
 
         .stat-value {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: 700;
+            letter-spacing: -0.5px;
         }
 
         .add-plan-btn {
-            background: #1a1a1a;
-            border: none;
+            background: #111;
+            border: 1px solid #222;
             color: #4ade80;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 14px;
+            padding: 10px 18px;
+            border-radius: 12px;
+            font-size: 13px;
             cursor: pointer;
             font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .add-plan-btn:hover {
+            background: #1a1a1a;
+            border-color: #333;
         }
 
         .delete-overlay {
@@ -382,6 +468,7 @@
             align-items: center;
             justify-content: center;
             z-index: 10;
+            backdrop-filter: blur(10px);
         }
 
         .delete-overlay.active {
@@ -392,11 +479,68 @@
             background: #fff;
             border: none;
             color: #ef4444;
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-size: 16px;
+            padding: 14px 28px;
+            border-radius: 10px;
+            font-size: 15px;
             font-weight: 700;
             cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .delete-btn-overlay:hover {
+            transform: scale(1.05);
+        }
+
+        .chart-container {
+            background: #0a0a0a;
+            border: 1px solid #111;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .chart-title {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #fff;
+            letter-spacing: -0.3px;
+        }
+
+        .chart-canvas {
+            width: 100%;
+            height: 200px;
+            position: relative;
+        }
+
+        .chart-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+        }
+
+        .legend-label {
+            color: #999;
+            font-weight: 500;
+        }
+
+        .legend-value {
+            color: #fff;
+            font-weight: 600;
         }
     </style>
 </head>
@@ -441,6 +585,12 @@
         </div>
     </div>
 
+    <div class="chart-container" id="chartContainer" style="display: none;">
+        <div class="chart-title">Spending by Category</div>
+        <canvas id="spendingChart" class="chart-canvas"></canvas>
+        <div class="chart-legend" id="chartLegend"></div>
+    </div>
+
     <div class="section-title" style="display: flex; justify-content: space-between; align-items: center;">
         <span>Savings Plans</span>
         <button class="add-plan-btn" onclick="openSavingsModal()">+ Add Plan</button>
@@ -466,7 +616,7 @@
     </div>
 
     <div style="text-align: center; padding: 40px 20px 80px; color: #444; font-size: 12px;">
-        <span onclick="handleAdminClick()" style="cursor: pointer;">Made by theoneandonlyJev</span>
+        Made by theoneandonlyJev
     </div>
 
     <button class="add-btn" onclick="openExpenseModal()">
@@ -515,7 +665,7 @@
     <div class="modal" id="resetModal">
         <div class="modal-content">
             <div class="modal-header">
-                <div class="modal-title">Reset Everything?</div>
+                <div class="modal-title" onclick="openAdminMenu()" style="cursor: pointer; user-select: none;">Reset Everything?</div>
                 <button class="close-btn" onclick="closeModal('resetModal')">✕</button>
             </div>
             <p style="color: #999; margin-bottom: 20px;">This will permanently delete all your data including transactions, savings plans, and reset your balance. This action cannot be undone.</p>
@@ -703,8 +853,6 @@
         let holdTimer = null;
         let deleteIndex = -1;
         let userName = '';
-        let adminClickCount = 0;
-        let adminClickTimer = null;
 
         // Load data on start
         loadData();
@@ -1145,6 +1293,71 @@
             a.download = `finance_tracker_backup_${new Date().toISOString().split('T')[0]}.json`;
             a.click();
             window.URL.revokeObjectURL(url);
+        }
+
+        function updateChart() {
+            const expenses = transactions.filter(t => !t.isIncome);
+            
+            if (expenses.length === 0) {
+                document.getElementById('chartContainer').style.display = 'none';
+                return;
+            }
+
+            document.getElementById('chartContainer').style.display = 'block';
+
+            // Group by category
+            const categoryTotals = {};
+            expenses.forEach(t => {
+                categoryTotals[t.category] = (categoryTotals[t.category] || 0) + t.amount;
+            });
+
+            // Sort and get top 5
+            const sortedCategories = Object.entries(categoryTotals)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 5);
+
+            const canvas = document.getElementById('spendingChart');
+            const ctx = canvas.getContext('2d');
+            const width = canvas.parentElement.clientWidth;
+            const height = 200;
+            canvas.width = width;
+            canvas.height = height;
+
+            ctx.clearRect(0, 0, width, height);
+
+            const total = sortedCategories.reduce((sum, [, amount]) => sum + amount, 0);
+            const colors = ['#4ade80', '#60a5fa', '#a78bfa', '#fbbf24', '#ef4444'];
+
+            // Draw pie chart
+            let currentAngle = -Math.PI / 2;
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const radius = Math.min(width, height) / 2 - 20;
+
+            sortedCategories.forEach(([category, amount], index) => {
+                const sliceAngle = (amount / total) * 2 * Math.PI;
+                
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius, currentAngle, currentAngle + sliceAngle);
+                ctx.lineTo(centerX, centerY);
+                ctx.fillStyle = colors[index];
+                ctx.fill();
+
+                currentAngle += sliceAngle;
+            });
+
+            // Update legend
+            const legend = document.getElementById('chartLegend');
+            legend.innerHTML = sortedCategories.map(([category, amount], index) => {
+                const percentage = ((amount / total) * 100).toFixed(1);
+                return `
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: ${colors[index]}"></div>
+                        <div class="legend-label">${category}</div>
+                        <div class="legend-value">${percentage}%</div>
+                    </div>
+                `;
+            }).join('');
         }
     </script>
 </body>
