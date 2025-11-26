@@ -164,6 +164,7 @@
             border-radius: 12px;
             padding: 16px;
             margin-bottom: 10px;
+            position: relative;
         }
 
         .budget-header {
@@ -368,21 +369,49 @@
             cursor: pointer;
             font-weight: 600;
         }
+
+        .delete-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(239, 68, 68, 0.95);
+            border-radius: 12px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        .delete-overlay.active {
+            display: flex;
+        }
+
+        .delete-btn-overlay {
+            background: #fff;
+            border: none;
+            color: #ef4444;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
     <div class="header">
-        <svg class="wallet-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/>
-            <path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/>
-            <path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/>
-        </svg>
-        <button class="edit-btn" onclick="openBalanceModal()">Edit</button>
+        <div>
+            <div style="color: #888; font-size: 14px; margin-bottom: 4px;">Good day,</div>
+            <div style="font-size: 20px; font-weight: 700;" id="userName">Friend</div>
+        </div>
+        <button class="edit-btn" onclick="openResetModal()">Reset</button>
     </div>
 
     <div class="balance-section">
         <div class="balance-label">Current Balance</div>
-        <div class="balance-amount" id="balanceDisplay">J$0.00</div>
+        <div class="balance-amount" id="balanceDisplay">$0.00 JMD</div>
     </div>
 
     <div class="action-cards">
@@ -400,7 +429,7 @@
                 <path d="M12 6v6l4 2"/>
             </svg>
             <div class="action-label">Spending</div>
-            <div class="action-amount" id="totalSpending">J$0.00</div>
+            <div class="action-amount" id="totalSpending">$0.00 JMD</div>
         </div>
     </div>
 
@@ -427,17 +456,17 @@
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-label">Total Planned</div>
-                <div class="stat-value" id="totalPlanned">J$0.00</div>
+                <div class="stat-value" id="totalPlanned">$0.00 JMD</div>
             </div>
             <div class="stat-card">
                 <div class="stat-label">Remaining</div>
-                <div class="stat-value" id="remaining">J$0.00</div>
+                <div class="stat-value" id="remaining">$0.00 JMD</div>
             </div>
         </div>
     </div>
 
     <div style="text-align: center; padding: 40px 20px 80px; color: #444; font-size: 12px;">
-        Made by theoneandonlyJev
+        <span onclick="handleAdminClick()" style="cursor: pointer;">Made by theoneandonlyJev</span>
     </div>
 
     <button class="add-btn" onclick="openExpenseModal()">
@@ -461,6 +490,79 @@
                 <input type="number" class="form-input" id="balanceInput" placeholder="0.00" step="0.01">
             </div>
             <button class="submit-btn" onclick="confirmBalanceChange()">Save Balance</button>
+        </div>
+    </div>
+
+    <!-- Welcome Modal -->
+    <div class="modal" id="welcomeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Welcome! 👋</div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">What's your name?</label>
+                <input type="text" class="form-input" id="nameInput" placeholder="Enter your name">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Starting Balance</label>
+                <input type="number" class="form-input" id="initialBalanceInput" placeholder="0.00" step="0.01">
+            </div>
+            <button class="submit-btn" onclick="saveInitialSetup()">Get Started</button>
+        </div>
+    </div>
+
+    <!-- Reset Confirmation Modal -->
+    <div class="modal" id="resetModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Reset Everything?</div>
+                <button class="close-btn" onclick="closeModal('resetModal')">✕</button>
+            </div>
+            <p style="color: #999; margin-bottom: 20px;">This will permanently delete all your data including transactions, savings plans, and reset your balance. This action cannot be undone.</p>
+            <div style="display: flex; gap: 10px;">
+                <button class="submit-btn" style="background: #333; color: #fff;" onclick="closeModal('resetModal')">Cancel</button>
+                <button class="submit-btn" style="background: #ef4444;" onclick="confirmReset()">Yes, Reset Everything</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Menu Modal -->
+    <div class="modal" id="adminModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Admin Menu 🔧</div>
+                <button class="close-btn" onclick="closeModal('adminModal')">✕</button>
+            </div>
+            <div style="margin-bottom: 20px;">
+                <div style="color: #888; font-size: 14px; margin-bottom: 12px;">Export Options</div>
+                <button class="submit-btn" style="background: #4ade80; margin-bottom: 10px;" onclick="downloadTransactionsCSV()">📥 Download Transactions (CSV)</button>
+                <button class="submit-btn" style="background: #60a5fa; margin-bottom: 10px;" onclick="downloadTransactionsJSON()">📥 Download Transactions (JSON)</button>
+                <button class="submit-btn" style="background: #a78bfa;" onclick="downloadAllData()">📥 Download All Data (JSON)</button>
+            </div>
+            <div style="border-top: 1px solid #333; padding-top: 20px; margin-top: 20px;">
+                <div style="color: #888; font-size: 14px; margin-bottom: 8px;">Statistics</div>
+                <div style="color: #fff; font-size: 14px; line-height: 1.8;">
+                    <div>Total Transactions: <span style="color: #4ade80;" id="adminTotalTransactions">0</span></div>
+                    <div>Total Income: <span style="color: #4ade80;" id="adminTotalIncome">$0.00 JMD</span></div>
+                    <div>Total Expenses: <span style="color: #ef4444;" id="adminTotalExpenses">$0.00 JMD</span></div>
+                    <div>Savings Plans: <span style="color: #60a5fa;" id="adminSavingsPlans">0</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Password Modal -->
+    <div class="modal" id="adminPasswordModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Admin Access 🔐</div>
+                <button class="close-btn" onclick="closeModal('adminPasswordModal')">✕</button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Enter Password</label>
+                <input type="password" class="form-input" id="adminPasswordInput" placeholder="Enter password" maxlength="4">
+            </div>
+            <button class="submit-btn" onclick="checkAdminPassword()">Unlock</button>
         </div>
     </div>
 
@@ -555,14 +657,33 @@
     <div class="modal" id="addToSavingsModal">
         <div class="modal-content">
             <div class="modal-header">
-                <div class="modal-title">Add to <span id="selectedSavingsName"></span></div>
+                <div class="modal-title">Manage <span id="selectedSavingsName"></span></div>
                 <button class="close-btn" onclick="closeModal('addToSavingsModal')">✕</button>
             </div>
             <div class="form-group">
-                <label class="form-label">Amount to Add</label>
+                <label class="form-label">Amount</label>
                 <input type="number" class="form-input" id="addToSavingsAmount" placeholder="0.00" step="0.01">
             </div>
-            <button class="submit-btn" onclick="addMoneyToSavings()">Add Money</button>
+            <div style="display: flex; gap: 10px;">
+                <button class="submit-btn" style="background: #ef4444;" onclick="removeMoneyFromSavings()">Remove Money</button>
+                <button class="submit-btn" onclick="addMoneyToSavings()">Add Money</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Savings Confirmation Modal -->
+    <div class="modal" id="deleteSavingsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Delete Savings Plan?</div>
+                <button class="close-btn" onclick="closeModal('deleteSavingsModal')">✕</button>
+            </div>
+            <p style="color: #999; margin-bottom: 8px;">Are you sure you want to delete "<span id="deleteSavingsName" style="color: #fff; font-weight: 600;"></span>"?</p>
+            <p style="color: #4ade80; font-size: 14px; margin-bottom: 20px;">$<span id="deleteSavingsAmount"></span> JMD will be returned to your balance.</p>
+            <div style="display: flex; gap: 10px;">
+                <button class="submit-btn" style="background: #333; color: #fff;" onclick="closeModal('deleteSavingsModal')">Cancel</button>
+                <button class="submit-btn" style="background: #ef4444;" onclick="confirmDeleteSavings()">Delete Plan</button>
+            </div>
         </div>
     </div>
 
@@ -579,6 +700,11 @@
         let savings = [];
         let selectedCategory = '';
         let selectedSavingsIndex = -1;
+        let holdTimer = null;
+        let deleteIndex = -1;
+        let userName = '';
+        let adminClickCount = 0;
+        let adminClickTimer = null;
 
         // Load data on start
         loadData();
@@ -590,6 +716,14 @@
                 balance = data.balance || 0;
                 transactions = data.transactions || [];
                 savings = data.savings || [];
+                userName = data.userName || '';
+            }
+            
+            // Show welcome modal if first time
+            if (!userName) {
+                document.getElementById('welcomeModal').classList.add('active');
+            } else {
+                document.getElementById('userName').textContent = userName;
             }
             
             // Add default savings plans if none exist and balance is set
@@ -614,15 +748,16 @@
             localStorage.setItem('financeData', JSON.stringify({
                 balance,
                 transactions,
-                savings
+                savings,
+                userName
             }));
         }
 
         function updateDisplay() {
-            document.getElementById('balanceDisplay').textContent = `J$${balance.toFixed(2)}`;
+            document.getElementById('balanceDisplay').textContent = `JMD${balance.toFixed(2)}`;
             
             const totalSpent = transactions.reduce((sum, t) => t.isIncome ? sum : sum + t.amount, 0);
-            document.getElementById('totalSpending').textContent = `J$${totalSpent.toFixed(2)}`;
+            document.getElementById('totalSpending').textContent = `JMD${totalSpent.toFixed(2)}`;
             
             updateTransactionsList();
             updateSavingsList();
@@ -645,7 +780,7 @@
                             <div class="transaction-category">${t.category}</div>
                             <div class="transaction-date">${t.date}${t.note ? ' • ' + t.note : ''}</div>
                         </div>
-                        <div class="transaction-amount" style="color: ${t.isIncome ? '#4ade80' : '#ef4444'}">${t.isIncome ? '+' : '-'}J$${t.amount.toFixed(2)}</div>
+                        <div class="transaction-amount" style="color: ${t.isIncome ? '#4ade80' : '#ef4444'}">${t.isIncome ? '+' : '-'}JMD${t.amount.toFixed(2)}</div>
                     </div>
                 `).join('');
             }
@@ -665,13 +800,23 @@
                 list.innerHTML = savings.map((s, i) => {
                     const progress = (s.current / s.target) * 100;
                     return `
-                        <div class="budget-item" onclick="openAddToSavingsModal(${i})" style="cursor: pointer;">
+                        <div class="budget-item" style="cursor: pointer;" 
+                             onmousedown="startHold(${i})" 
+                             onmouseup="cancelHold()" 
+                             onmouseleave="cancelHold()"
+                             ontouchstart="startHold(${i})" 
+                             ontouchend="cancelHold()" 
+                             ontouchcancel="cancelHold()"
+                             onclick="handleSavingsClick(event, ${i})">
                             <div class="budget-header">
                                 <div class="budget-name">${s.name}</div>
-                                <div class="budget-amount">J$${s.current.toFixed(2)} / J$${s.target.toFixed(2)}</div>
+                                <div class="budget-amount">JMD${s.current.toFixed(2)} / JMD${s.target.toFixed(2)}</div>
                             </div>
                             <div class="progress-bar">
                                 <div class="progress-fill" style="width: ${Math.min(progress, 100)}%; background: ${colors[i % colors.length]}"></div>
+                            </div>
+                            <div class="delete-overlay" id="deleteOverlay${i}">
+                                <button class="delete-btn-overlay" onclick="event.stopPropagation(); deleteSavingsPlan(${i})">Delete Plan</button>
                             </div>
                         </div>
                     `;
@@ -681,8 +826,8 @@
 
         function updateStats() {
             const totalPlanned = savings.reduce((sum, s) => sum + s.target, 0);
-            document.getElementById('totalPlanned').textContent = `J$${totalPlanned.toFixed(2)}`;
-            document.getElementById('remaining').textContent = `J$${balance.toFixed(2)}`;
+            document.getElementById('totalPlanned').textContent = `JMD${totalPlanned.toFixed(2)}`;
+            document.getElementById('remaining').textContent = `JMD${balance.toFixed(2)}`;
         }
 
         function openBalanceModal() {
@@ -821,6 +966,185 @@
                     alert('Insufficient balance!');
                 }
             }
+        }
+
+        function removeMoneyFromSavings() {
+            const amount = parseFloat(document.getElementById('addToSavingsAmount').value);
+            
+            if (!isNaN(amount) && amount > 0 && selectedSavingsIndex >= 0) {
+                if (amount <= savings[selectedSavingsIndex].current) {
+                    savings[selectedSavingsIndex].current -= amount;
+                    balance += amount;
+                    
+                    transactions.push({
+                        amount: amount,
+                        category: 'Savings Withdrawal',
+                        note: `Removed from ${savings[selectedSavingsIndex].name}`,
+                        date: new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
+                        isIncome: true
+                    });
+                    
+                    saveData();
+                    updateDisplay();
+                    closeModal('addToSavingsModal');
+                } else {
+                    alert('Insufficient funds in savings plan!');
+                }
+            }
+        }
+
+        function startHold(index) {
+            holdTimer = setTimeout(() => {
+                document.getElementById(`deleteOverlay${index}`).classList.add('active');
+            }, 500); // Hold for 500ms to show delete button
+        }
+
+        function cancelHold() {
+            if (holdTimer) {
+                clearTimeout(holdTimer);
+                holdTimer = null;
+            }
+        }
+
+        function handleSavingsClick(event, index) {
+            const overlay = document.getElementById(`deleteOverlay${index}`);
+            if (overlay && overlay.classList.contains('active')) {
+                overlay.classList.remove('active');
+            } else {
+                openAddToSavingsModal(index);
+            }
+        }
+
+        function deleteSavingsPlan(index) {
+            deleteIndex = index;
+            document.getElementById('deleteSavingsName').textContent = savings[index].name;
+            document.getElementById('deleteSavingsAmount').textContent = savings[index].current.toFixed(2);
+            
+            // Hide the delete overlay
+            document.getElementById(`deleteOverlay${index}`).classList.remove('active');
+            
+            // Show confirmation modal
+            document.getElementById('deleteSavingsModal').classList.add('active');
+        }
+
+        function confirmDeleteSavings() {
+            if (deleteIndex >= 0 && deleteIndex < savings.length) {
+                balance += savings[deleteIndex].current;
+                savings.splice(deleteIndex, 1);
+                deleteIndex = -1;
+                saveData();
+                updateDisplay();
+                closeModal('deleteSavingsModal');
+            }
+        }
+
+        function saveInitialSetup() {
+            const name = document.getElementById('nameInput').value.trim();
+            const initialBalance = parseFloat(document.getElementById('initialBalanceInput').value);
+            
+            if (name && !isNaN(initialBalance) && initialBalance >= 0) {
+                userName = name;
+                balance = initialBalance;
+                document.getElementById('userName').textContent = userName;
+                saveData();
+                updateDisplay();
+                closeModal('welcomeModal');
+            } else {
+                alert('Please enter your name and a valid balance!');
+            }
+        }
+
+        function openResetModal() {
+            document.getElementById('resetModal').classList.add('active');
+        }
+
+        function confirmReset() {
+            balance = 0;
+            transactions = [];
+            savings = [];
+            userName = '';
+            localStorage.removeItem('financeData');
+            closeModal('resetModal');
+            document.getElementById('welcomeModal').classList.add('active');
+            updateDisplay();
+        }
+
+        function openAdminMenu() {
+            // Update admin stats
+            document.getElementById('adminTotalTransactions').textContent = transactions.length;
+            
+            const totalIncome = transactions.reduce((sum, t) => t.isIncome ? sum + t.amount : sum, 0);
+            const totalExpenses = transactions.reduce((sum, t) => !t.isIncome ? sum + t.amount : sum, 0);
+            
+            document.getElementById('adminTotalIncome').textContent = `${totalIncome.toFixed(2)} JMD`;
+            document.getElementById('adminTotalExpenses').textContent = `${totalExpenses.toFixed(2)} JMD`;
+            document.getElementById('adminSavingsPlans').textContent = savings.length;
+            
+            document.getElementById('adminModal').classList.add('active');
+        }
+
+        function downloadTransactionsCSV() {
+            if (transactions.length === 0) {
+                alert('No transactions to download!');
+                return;
+            }
+
+            let csv = 'Date,Category,Amount (JMD),Type,Note\n';
+            transactions.forEach(t => {
+                const type = t.isIncome ? 'Income' : 'Expense';
+                const note = (t.note || '').replace(/,/g, ';'); // Replace commas in notes
+                csv += `${t.date},${t.category},${t.amount.toFixed(2)},${type},"${note}"\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `transactions_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        function downloadTransactionsJSON() {
+            if (transactions.length === 0) {
+                alert('No transactions to download!');
+                return;
+            }
+
+            const dataStr = JSON.stringify(transactions, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `transactions_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        function downloadAllData() {
+            const allData = {
+                userName,
+                balance,
+                transactions,
+                savings,
+                exportDate: new Date().toISOString(),
+                summary: {
+                    totalTransactions: transactions.length,
+                    totalIncome: transactions.reduce((sum, t) => t.isIncome ? sum + t.amount : sum, 0),
+                    totalExpenses: transactions.reduce((sum, t) => !t.isIncome ? sum + t.amount : sum, 0),
+                    savingsPlans: savings.length,
+                    totalSaved: savings.reduce((sum, s) => sum + s.current, 0)
+                }
+            };
+
+            const dataStr = JSON.stringify(allData, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `finance_tracker_backup_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            window.URL.revokeObjectURL(url);
         }
     </script>
 </body>
